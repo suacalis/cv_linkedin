@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Özgeçmiş ve LinkedIn Kliniği</title>
+<style>
+/* Layout: sticky kurumsal üst bar + sekmeli tek sayfa; her modül "vaka dosyası | işlem alanı" bölünmüş kokpit olarak kurulur */
+:root{
+  --bg:#F5F7FB; --surface:#FFFFFF; --surface-2:#EEF2F8; --ink:#0F1B3D; --muted:#56627A; --line:#D9E1EC;
+  --brand:#1E3A8A; --brand-ink:#FFFFFF; --brand-soft:#E3E9F8;
+  --accent:#0D9488; --accent-soft:#D5F1EE;
+  --good:#15803D; --good-soft:#DDF3E4; --warn:#B45309; --warn-soft:#FBEBD3; --bad:#B42318; --bad-soft:#FBE1DE;
+  --f-display:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1222; --surface:#111B30; --surface-2:#18243D; --ink:#E6ECF7; --muted:#9AA8C2; --line:#27344F;
+  --brand:#8EA6F2; --brand-ink:#0B1222; --brand-soft:#1C2A4E;
+  --accent:#2DD4BF; --accent-soft:#113A3A;
+  --good:#4ADE80; --good-soft:#123323; --warn:#FBBF24; --warn-soft:#3A2B10; --bad:#F87171; --bad-soft:#3D1716; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1222; --surface:#111B30; --surface-2:#18243D; --ink:#E6ECF7; --muted:#9AA8C2; --line:#27344F;
+  --brand:#8EA6F2; --brand-ink:#0B1222; --brand-soft:#1C2A4E;
+  --accent:#2DD4BF; --accent-soft:#113A3A;
+  --good:#4ADE80; --good-soft:#123323; --warn:#FBBF24; --warn-soft:#3A2B10; --bad:#F87171; --bad-soft:#3D1716; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.2;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:800}
+h2{font-size:clamp(1.35rem,2.6vw,1.75rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+h4{font-size:.95rem;font-weight:700}
+p{margin:0}
+a{color:var(--brand)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--f-display);font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.mono{font-family:var(--f-mono);font-size:.85em}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;gap:16px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:1.1rem;white-space:nowrap}
+button.brand{background:none;border:0;padding:0;cursor:pointer}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-size:.8rem;font-weight:800}
+.xp-pill{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);white-space:nowrap}
+.xp-pill b{color:var(--ink);font-variant-numeric:tabular-nums}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-bottom:0}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{flex:none;padding:10px 12px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.88rem;border-bottom:2px solid transparent;white-space:nowrap}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--brand);border-bottom-color:var(--brand)}
+
+main{padding-block:28px 56px}
+.shell main{padding-block:24px 56px}
+section.view{display:flex;flex-direction:column;gap:28px}
+.view-head{display:flex;flex-direction:column;gap:6px;max-width:70ch}
+
+/* Generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.split{display:grid;gap:16px;grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
+@media (max-width:860px){.split{grid-template-columns:minmax(0,1fr)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:8px;border:1px solid transparent;background:var(--brand);color:var(--brand-ink);font-weight:600;cursor:pointer;text-decoration:none;font-size:.92rem}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--brand);border-color:var(--line)}
+.btn.ghost:hover{background:var(--brand-soft)}
+.btn.acc{background:var(--accent);color:var(--brand-ink)}
+.btn.sm{padding:6px 10px;font-size:.82rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--surface-2);font-size:.78rem;font-weight:600;color:var(--muted);border:1px solid var(--line)}
+button.chip{cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.75rem;font-weight:700}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.info{background:var(--brand-soft);color:var(--brand)}
+label.field{display:flex;flex-direction:column;gap:4px;font-size:.82rem;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:.92rem;font-variant-numeric:tabular-nums}
+textarea{min-height:110px;resize:vertical}
+.fb{border-radius:8px;padding:10px 12px;font-size:.9rem;border:1px solid}
+.fb.ok{background:var(--good-soft);color:var(--good);border-color:transparent}
+.fb.err{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.fb.note{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.fb b{font-weight:700}
+.fb p{color:var(--ink);margin-top:4px}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:.92rem}
+.opt:hover{border-color:var(--brand)}
+.opt.sel-ok{border-color:var(--good);background:var(--good-soft)}
+.opt.sel-bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt .k{font-family:var(--f-display);font-weight:800;color:var(--brand);margin-right:8px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.85rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--surface-2);font-weight:600;color:var(--muted);font-size:.76rem;letter-spacing:.03em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+td input{min-width:90px;padding:5px 7px}
+code.f{display:block;font-family:var(--f-mono);font-size:.8rem;background:var(--surface-2);border:1px solid var(--line);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:pre}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.step{flex:1 1 120px;padding:8px 10px;border-radius:8px;background:var(--surface-2);font-size:.78rem;font-weight:600;color:var(--muted);border:1px solid var(--line)}
+.step.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.step.done{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.88rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.stat{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:8px;background:var(--surface-2)}
+.stat .v{font-family:var(--f-display);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.78rem;color:var(--muted);font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+hr.sep{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+/* Hero */
+.hero{display:grid;gap:28px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}
+@media (max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}}
+.hero-copy{display:flex;flex-direction:column;gap:16px;padding-top:8px}
+.hero-copy .lead{font-size:1.08rem;color:var(--muted);max-width:52ch}
+.hero-copy h1 em{font-style:normal;color:var(--accent)}
+.calc{border:1px solid var(--line);background:var(--surface);border-radius:12px;overflow:hidden}
+.calc-head{background:var(--brand);color:var(--brand-ink);padding:12px 18px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.calc-head h3{font-size:1rem}
+.calc-body{padding:18px;display:flex;flex-direction:column;gap:12px}
+.calc-out{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.calc-out .line{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.calc-out .line.total{font-family:var(--f-display);font-weight:800;font-size:1.1rem;color:var(--accent)}
+.tools-bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;padding:14px 0;border-block:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.tools-bar b{font-family:var(--f-display);color:var(--ink)}
+.path-card{border-top:3px solid var(--brand)}
+.path-card ul{margin:0;padding-left:18px;font-size:.9rem;color:var(--muted)}
+.case-box{background:var(--brand);color:var(--brand-ink);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.case-box .eyebrow{color:inherit;opacity:.8}
+.case-box textarea{background:var(--surface);color:var(--ink)}
+.case-box p.q{font-family:var(--f-display);font-size:1.15rem;font-weight:600;max-width:70ch}
+
+/* Radar ve gösterge paneli */
+.radar svg{width:100%;max-width:340px;height:auto;display:block;margin:0 auto}
+.dash{display:grid;gap:16px;grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+@media (max-width:860px){.dash{grid-template-columns:minmax(0,1fr)}}
+.port-card{border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.port-card.locked{opacity:.6;border-style:dashed}
+
+/* ATS */
+.ats{display:grid;gap:14px;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1.1fr)}
+@media (max-width:1000px){.ats{grid-template-columns:minmax(0,1fr)}}
+.bubble{padding:12px 14px;border-radius:10px;font-size:.92rem;max-width:92%}
+.bubble.cand{background:var(--surface-2);align-self:flex-start;border-top-left-radius:2px}
+.bubble.me{background:var(--brand);color:var(--brand-ink);align-self:flex-end;border-top-right-radius:2px}
+.chat{display:flex;flex-direction:column;gap:8px;min-height:160px}
+.star{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.star span{text-align:center;padding:6px 0;border-radius:6px;background:var(--surface-2);font-weight:800;font-family:var(--f-display);color:var(--muted);font-size:.85rem}
+.star span.on{background:var(--good-soft);color:var(--good)}
+.rate{display:flex;gap:4px}
+.rate button{width:32px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700}
+.rate button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--brand-ink)}
+.cand-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.cand-tabs button{flex:1 1 100px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:.85rem;text-align:left}
+.cand-tabs button[aria-pressed="true"]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.cand-tabs small{display:block;font-weight:500;color:var(--muted)}
+
+/* Templates */
+details.tpl{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+details.tpl summary{cursor:pointer;padding:16px 18px;display:flex;gap:12px;align-items:center;list-style:none}
+details.tpl summary::-webkit-details-marker{display:none}
+details.tpl summary .ix{font-family:var(--f-display);font-weight:800;color:var(--brand);font-size:1.2rem;width:28px}
+details.tpl summary .chev{margin-left:auto;transition:transform .2s;color:var(--muted)}
+details.tpl[open] summary .chev{transform:rotate(90deg)}
+details.tpl .body{padding:0 18px 18px;display:flex;flex-direction:column;gap:14px}
+.formula-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
+.formula-row .lbl{grid-column:1/-1;font-size:.82rem;font-weight:600;color:var(--muted)}
+
+/* Calendar */
+.cal{display:grid;gap:10px}
+.wk{display:grid;grid-template-columns:72px minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.wk .n{font-family:var(--f-display);font-weight:800;color:var(--brand)}
+.wk .n small{display:block;font-weight:600;color:var(--muted);font-size:.72rem}
+@media (max-width:760px){.wk{grid-template-columns:minmax(0,1fr)}}
+.month-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-top:8px}
+
+/* Portfolio */
+.prof{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.avatar{width:84px;height:84px;border-radius:14px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.8rem}
+.skill-line{display:grid;grid-template-columns:minmax(0,1fr) 110px 40px;gap:10px;align-items:center;font-size:.86rem}
+.proj{border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.proj ul{margin:0;padding-left:18px;font-size:.88rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.88rem;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+nav.tabs .spacer{flex:1 0 12px}
+nav.tabs a.user{color:var(--accent)}
+.subnav{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.subnav .crumb{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.subnav .crumb b{font-family:var(--f-display);font-size:.95rem}
+.subnav .crumb span{font-size:.84rem;color:var(--muted);max-width:80ch}
+.subnav .segs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.subnav .segs::-webkit-scrollbar{display:none}
+.subnav .segs a{flex:none;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);text-decoration:none;color:var(--muted);font-weight:600;font-size:.86rem}
+.subnav .segs a:hover{color:var(--ink);border-color:var(--brand)}
+.subnav .segs a[aria-current="page"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);gap:32px;align-items:start}
+aside.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);max-height:calc(100vh - 86px);overflow-y:auto;padding-block:24px 24px;display:flex;flex-direction:column;gap:4px;scrollbar-width:thin}
+.side .ni{display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;color:var(--muted);font:inherit;font-size:.88rem;padding:7px 10px;border-radius:7px;font-weight:500}
+.side .ni:hover{color:var(--ink);background:var(--surface-2)}
+.side .ni[aria-current="page"]{background:var(--brand-soft);color:var(--brand);font-weight:700}
+button.as-link{background:none;border:0;padding:0;font:inherit;color:var(--brand);text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:left}
+button.card{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%}
+button.card:hover{border-color:var(--brand)}
+.map-card .subs button{font-size:.88rem;font-weight:600;text-decoration:none}
+.map-card .subs button:hover{text-decoration:underline}
+.side .grp{display:flex;flex-direction:column;gap:1px;margin-top:10px}
+.side .grp-h{font-family:var(--f-display);font-weight:700;font-size:.9rem;color:var(--ink);padding:6px 10px}
+.side .grp-h.on{color:var(--brand)}
+.side .grp .sub{padding-left:22px;position:relative}
+.side .grp .sub::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;border-radius:2px;background:var(--line)}
+.side .grp .sub[aria-current="page"]::before{background:var(--brand)}
+.side .sep{border-top:1px solid var(--line);margin:12px 4px 2px}
+.side .lbl{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 10px 2px}
+.menu-btn{display:none;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;font-size:.88rem}
+main{min-width:0}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  .menu-btn{display:inline-flex}
+  aside.side{position:static;max-height:none;display:none;border-bottom:1px solid var(--line);padding-block:12px}
+  aside.side.open{display:flex}
+}
+.term{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.term b{font-family:var(--f-display)}
+details.law{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.law summary{cursor:pointer;padding:12px 14px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+details.law summary .mono{color:var(--brand);font-weight:700;flex:none}
+details.law div{padding:0 14px 14px;font-size:.9rem;color:var(--muted)}
+.map-card{border-top:3px solid var(--accent)}
+.map-card .subs{display:flex;flex-direction:column;gap:4px}
+.map-card .subs a{font-size:.88rem;font-weight:600;text-decoration:none}
+.map-card .subs a:hover{text-decoration:underline}
+.ladder{display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:860px){.ladder{grid-template-columns:minmax(0,1fr)}}
+.rung{border:1px solid var(--line);border-radius:var(--r);padding:14px;background:var(--surface);display:flex;flex-direction:column;gap:6px;position:relative}
+.rung .lv{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.rung.here{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.thread{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.reply{border-left:3px solid var(--line);padding:4px 0 4px 12px;font-size:.9rem}
+.reply b{font-size:.82rem}
+.job{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.fav{background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--muted)}
+.fav[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.check-item{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.check-item input{margin-top:3px}
+footer{border-top:1px solid var(--line);padding-block:22px;font-size:.84rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.solo-top .top-row{justify-content:space-between;flex-wrap:wrap;gap:4px 12px;height:auto;min-height:56px;padding-block:8px}
+.solo-top .top-row>span{min-width:0}
+.solo main{max-width:1180px;margin:0 auto}
+</style>
+</head>
+<body>
+<header class="top solo-top"><div class="wrap"><div class="top-row">
+  <span class="brand"><span class="brand-mark">İK</span>Özgeçmiş ve LinkedIn Kliniği</span>
+  <span class="small muted">İK Kampüs aracı · metinler yalnızca bu tarayıcıda işlenir</span>
+</div></div></header>
+<div class="wrap solo"><main id="main">
+<section class="view" data-view="klinik">
+  <div class="view-head"><h2>Özgeçmiş ve LinkedIn kliniği</h2><p class="muted">Üç araç: özgeçmişini bir iş ilanıyla doğal dil işleme yöntemleriyle karşılaştıran uyum analizi, kontrol listesiyle öz denetim ve metin üslubu analizi. Mentor incelemesinden önce bu adımları tamamla.</p></div>
+  <div class="card" id="nlpCard">
+    <div class="row" style="justify-content:space-between"><div><span class="eyebrow">Doğal dil işleme</span><h3>Özgeçmiş ve iş ilanı uyum analizi</h3></div><span class="pill info">Metinler bu cihazda işlenir, kaydedilmez</span></div>
+    <p class="small muted" style="max-width:80ch">Özgeçmişini ve başvurmak istediğin ilanı yapıştır ya da dosya olarak yükle (.txt, .docx, .pdf). Araç; beceri kapsamasını, metinler arası anlamsal yakınlığı ve ilandaki her gereksinimin özgeçmişte karşılanıp karşılanmadığını hesaplar. Örnek metinlerle açılır.</p>
+    <div class="grid g2">
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <div class="row" style="justify-content:space-between"><label class="field" for="nlpCv" style="margin:0">Özgeçmiş metni</label><label class="btn ghost sm" style="cursor:pointer">Dosya yükle<input type="file" id="nlpCvFile" accept=".txt,.docx,.pdf" hidden></label></div>
+        <textarea id="nlpCv" style="min-height:260px"></textarea><span class="small muted" id="nlpCvMsg"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <div class="row" style="justify-content:space-between"><label class="field" for="nlpJob" style="margin:0">İş ilanı metni</label><label class="btn ghost sm" style="cursor:pointer">Dosya yükle<input type="file" id="nlpJobFile" accept=".txt,.docx,.pdf" hidden></label></div>
+        <textarea id="nlpJob" style="min-height:260px"></textarea><span class="small muted" id="nlpJobMsg"></span>
+      </div>
+    </div>
+    <div class="row"><button class="btn" id="nlpRun">Uyumu analiz et</button><button class="btn ghost sm" id="nlpSample">Örnek metinleri geri yükle</button><button class="btn ghost sm" id="nlpClear">Alanları temizle</button></div>
+    <div id="nlpOut" style="display:flex;flex-direction:column;gap:16px"></div>
+    <details class="law"><summary>Yöntem: araç metni nasıl işliyor?</summary><div>
+      <ol style="margin:0;padding-left:18px">
+        <li><b>Ön işleme:</b> Türkçe küçük harfe çevirme, noktalama temizliği, dolgu (stop) kelimelerin atılması.</li>
+        <li><b>Hafif gövdeleme:</b> Türkçe çekim ekleri (-lar, -ın, -da, -dan, -lık vb.) en az 4 harflik gövde kalacak şekilde ayıklanır; "raporlarının" ve "raporlama" aynı köke yaklaşır.</li>
+        <li><b>Temsil:</b> Tek kelime ve iki kelimelik öbekler; ağırlıklar TF-IDF ile, ters belge sıklığı platformdaki İK metinlerinden oluşan başvuru derlemiyle hesaplanır.</li>
+        <li><b>Anlamsal yakınlık:</b> İki metnin TF-IDF vektörleri arasındaki kosinüs benzerliği.</li>
+        <li><b>Beceri çıkarımı:</b> Eş anlamlılarıyla tanımlanmış İK beceri sözlüğü (ör. "özet tablo" ve "pivot" aynı beceri) ile kural tabanlı varlık tanıma.</li>
+        <li><b>Gereksinim eşleşmesi:</b> İlanın her madde satırındaki anlamlı kökler özgeçmişte aranır; deneyim yılı ayrıca sayısal olarak karşılaştırılır.</li>
+        <li><b>Uyum puanı:</b> %45 beceri kapsaması, %30 gereksinim karşılama, %25 anlamsal yakınlık.</li>
+      </ol>
+      <p style="margin-top:8px">Bu, aday takip sistemlerinin anahtar kelime eşleştirmesine benzeyen, açıklanabilir bir yöntemdir; anlamı tam kavrayan bir dil modeli değildir. Sonucu bir ön kontrol olarak kullan.</p></div></details>
+  </div>
+  <div class="split">
+    <div class="card"><div class="row" style="justify-content:space-between"><h3>Öz denetim listesi</h3><span class="pill" id="ckScore"></span></div><div id="ckList" style="display:flex;flex-direction:column;gap:6px"></div></div>
+    <div class="card"><h3>CV metni analizi</h3><p class="small muted">Deneyim maddelerini veya özet paragrafını yapıştır. Metin bu cihazda analiz edilir, hiçbir yere gönderilmez.</p>
+      <textarea id="cvText" style="min-height:180px">Stajyer olarak İK departmanında çalıştım. İletişimi güçlü, takım çalışmasına yatkın biriyim. Biz ekipçe işe alım süreçlerine destek verdik. 120 başvuruyu ön elemeden geçirerek mülakat listesini hazırladım ve ilk 90 gün işten ayrılma raporunu Excel'de hazırladım.</textarea>
+      <div id="cvOut" style="display:flex;flex-direction:column;gap:8px"></div></div>
+  </div>
+</section>
+</main></div>
+<div class="toast" id="toast" hidden></div>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1800)}
+/* Durum: kontrol listesi işaretleri bu tarayıcıda saklanır */
+const KEY='ikklinik.v1';let S={cv:[],nlpDone:false};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({cv:S.cv,nlpDone:S.nlpDone}))}catch(e){}};
+const addXP=()=>{};
+/* Başvuru derlemi (TF-IDF ters belge sıklığı için İK metinleri) */
+const DOCS=[
+ {t:'İş teklif mektubu ',k:'İşe Alım',o:['Aday bilgisi ve tarih','Pozisyon, bağlı olunan yönetici, çalışma yeri ve şekli','İşe başlama tarihi','Brüt ücret, prim ve yan haklar','Deneme süresi (4857 Md. 15: en fazla 2 ay; TİS ile 4 aya kadar)','Teklifin geçerlilik süresi ve kabul yöntemi','Koşullar: referans kontrolü ve işe giriş evrakları']},
+ {t:'Belirsiz süreli iş sözleşmesi iskeleti',k:'Özlük ve Hukuk',o:['Taraflar','İşin tanımı ve işyeri','Süre ve deneme süresi','Çalışma süresi: haftalık en fazla 45 saat, fazla çalışma onayı','Ücret, ödeme zamanı ve yöntemi','Yıllık ücretli izin','Gizlilik ve kişisel verilerin korunması','Fesih ve bildirim süreleri (Md. 17)','Uyuşmazlıklarda zorunlu arabuluculuk ve yetkili mahkeme']},
+ {t:'KVKK çalışan aydınlatma metni',k:'KVKK',o:['Veri sorumlusunun kimliği','İşlenen kişisel veri kategorileri','İşleme amaçları','Hukuki sebepler (KVKK Md. 5-6)','Aktarılan alıcı grupları (SGK, vergi idaresi vb.) ve amaçları','Toplama yöntemi','İlgili kişinin hakları (KVKK Md. 11)','Başvuru yöntemi ve iletişim bilgisi']},
+ {t:'KVKK aday aydınlatma metni',k:'KVKK',o:['Veri sorumlusu','Toplanan aday verileri (CV, mülakat notu, referans)','İşe alım sürecine özgü amaçlar','Saklama süresi ve imha','Yurt dışına aktarım (aday takip sistemi sunucusu dışarıdaysa)','Aday hakları ve başvuru yolu']},
+ {t:'Savunma istem yazısı',k:'Özlük ve Hukuk',o:['Konu ve tarih','İddia edilen olay: tarih, yer, somut davranış','Dayanak: sözleşme, disiplin yönetmeliği, 4857 maddesi','Savunma için makul süre (ör. 2 iş günü)','Savunma verilmezse doğacak sonuç','Tebliğ ve imza alanı']},
+ {t:'Oryantasyon kontrol listesi',k:'Eğitim ve Gelişim',o:['İşe başlama öncesi: hoş geldin e-postası, ekipman talebi','İlk gün: IT hesapları, kartlar, İSG eğitimi','İlk hafta: ekip tanışması, rehber çalışan ataması','1. ay: hedef kartı, yönetici birebir görüşmesi','30. ve 60. gün nabız anketi','3. ay: deneme süresi değerlendirmesi']},
+ {t:'Çıkış mülakatı formu',k:'Eğitim ve Gelişim',o:['Ayrılma kararını tetikleyen olay','Yönetici ilişkisi (1-5)','Ücret ve yan hak algısı (1-5)','İş yükü ve vardiya uyumu','Gelişim fırsatları','Tekrar çalışır mısınız? Arkadaşınıza önerir misiniz?','Kök neden kodu (İK doldurur)']},
+ {t:'Uzaktan çalışma politikası',k:'Politika',o:['Kapsam ve uygunluk kriterleri','Uzaktan Çalışma Yönetmeliği (2021) uyarınca yazılı sözleşme','Ekipman ve giderlerin karşılanması','Çalışma saatleri ve ulaşılabilirlik','İSG ve veri güvenliği yükümlülükleri','Performans takibi ve iletişim ritmi']}];
+const CASES=[
+ {id:'v42',a:'İK Analitiği',t:'Mavi yakada ilk 3 ayda %35 işten ayrılma',p:'Üretim tesisinde ilk 3 ayda ayrılma oranı %35\'e çıktı. Ek İK bütçesi yok. Fabrika müdürü "maaşları artıralım" diyor.',d:['Ayrılanların çoğu gece vardiyasına atanmış','Çıkış mülakatlarında en sık neden vardiya ve servis saatleri','Oryantasyon 1 günlük, rehber çalışan uygulaması yok'],q:['Kök neden hipotezin nedir?','İlk 30 günde hangi 3 aksiyonu alırsın?','Başarıyı hangi metrikle ölçersin?'],f:['Ayrılmaları vardiya, işe alım kanalı ve amire göre kır; ücret yerine vardiya uyumunu test et','Mülakatta gerçekçi iş önizlemesi: vardiya ve servis bilgisi açıkça anlatılsın','Bütçesiz aksiyonlar: rehber çalışan ataması, ilk 2 hafta gündüz vardiyası, 30/60. gün nabız anketi','Metrik: 90 gün tutundurma oranı ve ilk ay devamsızlık; 3 ay sonra kıyasla']},
+ {id:'sendika',a:'İş Hukuku',t:'Sendikalı çalışanın performans düşüklüğü nedeniyle feshi',p:'Sendika temsilcisi de olan bir çalışanın hedef gerçekleşmesi iki dönemdir %60\'ın altında. Yönetici feshi istiyor.',d:['Hedefler yazılı ve imzalı değil','Önceki dönem performans görüşmesi kaydı yok','İşyerinde TİS yürürlükte, disiplin kurulu hükmü var'],q:['Feshe geçmeden önce hangi belgeleri tamamlarsın?','Sendikal neden algısı riskini nasıl yönetirsin?','Temsilcilik statüsü süreci nasıl etkiler?'],f:['Objektif ve önceden bildirilmiş hedefler olmadan geçerli fesih savunulamaz: önce yazılı hedef ve PGP','4857 Md. 18-19: savunma alınmadan performans nedeniyle fesih yapılamaz','TİS disiplin kurulu hükümlerini uygula; usule aykırılık feshi geçersiz kılar','6356 Md. 24-25: temsilci güvencesi ve sendikal tazminat riski; her adımı belgele, benzer performanslı sendikasız çalışanlara eşit uygula']},
+ {id:'cagri',a:'İşe Alım',t:'Çağrı merkezinde tutundurma projesi',p:'200 kişilik çağrı merkezinde yıllık işten ayrılma %60. İşe alım ekibi sürekli ilan açmaktan stratejik işe vakit bulamıyor.',d:['İşe alım ortalama 9 günde tamamlanıyor, mülakat 15 dakika','Ayrılanların %40\'ı ilk 60 günde çıkıyor','Ekip liderlerinin yarısı terfi eden temsilciler, liderlik eğitimi almamış'],q:['Hangi metrikleri önce birleştirirsin?','İşe alım sürecinde neyi değiştirirsin?','Ekip liderleri için ne önerirsin?'],f:['Kanal bazında 60 gün tutundurmayı ölç; referans kanalını önceliklendir','Kısa iş simülasyonu (rol oyunu çağrısı) ekle: hız biraz düşer, uyum artar','Ekip liderlerine koçluk ve geri bildirim eğitimi; lider bazında işten ayrılma panosu','Kariyer basamağı (kıdemli temsilci, kalite uzmanı) tanımla']},
+ {id:'9box',a:'Eğitim ve Gelişim',t:'Sübjektif performans değerlendirmesinden 9’lu yetenek matrisi\'a',p:'Yıllık değerlendirmelerde herkes 4 veya 5 alıyor; terfi kararlarını yöneticilerin kişisel tercihleri belirliyor.',d:['Ölçülebilir hedef kartı yok','Kalibrasyon toplantısı yapılmıyor','Potansiyel hiç değerlendirilmiyor'],q:['Performans ve potansiyeli nasıl ayrı ölçersin?','Kalibrasyonu nasıl kurgularsın?','9’lu yetenek matrisi kutularına göre hangi aksiyonları önerirsin?'],f:['Performans: hedef gerçekleşmesi; potansiyel: öğrenme çevikliği, sorumluluk alma gibi tanımlı göstergeler','Departman bazında kalibrasyon toplantısı ve önerilen dağılım','Yüksek potansiyel/düşük performans: rol uyumu ve koçluk; yüksek/yüksek: yedekleme planı','Sonuçları çalışana gelişim planıyla birlikte açıkla']},
+ {id:'kvkk',a:'İş Hukuku',t:'Aday CV\'lerinin mesajlaşma gruplarında paylaşılması',p:'Yöneticiler, aday CV\'lerini kişisel telefonlarındaki mesajlaşma gruplarında birbirine iletiyor. Bir aday durumu öğrenip şikâyet etti.',d:['Aday aydınlatma metni yok','CV\'ler e-posta ekleri ve kişisel cihazlarda dağınık','Saklama süresi tanımlı değil'],q:['İlk 48 saatte ne yaparsın?','Süreci nasıl yeniden tasarlarsın?','Yöneticilere ne söylersin?'],f:['Paylaşımı durdur, kapsamı tespit et, hukuk birimine bildir; KVKK Md. 12 veri güvenliği yükümlülüğünü değerlendir','Aday aydınlatma metni hazırla; CV\'ler yalnızca aday takip sisteminde, rol bazlı erişimle','Saklama ve imha politikası: işe alınmayan adayların verileri için süre tanımla','Yöneticilere kısa KVKK eğitimi ve "CV yalnızca aday takip sisteminde" kuralı']}];
+const QB=[
+ ['Müşteri odaklılık','Bir müşterinin talebini karşılayamadığınız bir durumu anlatır mısınız?','O an müşteriye tam olarak ne söylediniz ve ilişki nasıl sonuçlandı?',['Genel ifade, müşteri suçlanıyor','Somut adım var, sonuç belirsiz','Somut aksiyon, ölçülebilir sonuç, çıkarılan ders']],
+ ['Müşteri odaklılık','Bir iç müşterinin (yönetici, ekip) beklentisini aştığınız bir örnek verir misiniz?','Beklentiyi nasıl öğrendiniz, "aşmak" neyle ölçüldü?',['Beklenti tanımlanmamış','Beklenti net, sonuç anlatılmış','Ölçüt, aksiyon ve geri bildirim kanıtı var']],
+ ['İkna ve müzakere','Karşı tarafın başta "hayır" dediği bir konuda onayı aldığınız bir durumu anlatın.','Hangi veriyi ya da argümanı kullandınız? Neyi bilinçli olarak vermediniz?',['Israr veya kişisel ilişkiyle ikna','Gerekçe sunulmuş, alternatif yok','Veri, karşı tarafın çıkarı ve kazan-kazan çözüm']],
+ ['İkna ve müzakere','Bir adayı veya yöneticiyi ücret konusunda uzlaştırmanız gerekti mi? Nasıl ilerlediniz?','Bütçe sınırını nasıl açıkladınız, sonuç ne oldu?',['Pazarlık yok veya kontrolsüz taviz','Sınır korunmuş, gerekçe zayıf','Toplam paket, şeffaf gerekçe, iki taraf da memnun']],
+ ['Stres yönetimi','Aynı gün birden fazla acil işin çakıştığı bir anı anlatır mısınız?','Önceliği neye göre belirlediniz, hangi işi ertelediniz?',['Panik veya her şeyi aynı anda yapma','Öncelik var, iletişim eksik','Açık önceliklendirme, paydaşa bilgi, sonuç']],
+ ['Stres yönetimi','Size yöneltilen sert bir eleştiriye nasıl tepki verdiğinizi anlatın.','Eleştiriden sonra somut olarak neyi değiştirdiniz?',['Savunmacı tepki','Kabul var, değişiklik yok','Dinleme, netleştirme, ölçülebilir değişiklik']],
+ ['Takım çalışması','Ekipte görüş ayrılığı yaşadığınız bir durumu ve sizin rolünüzü anlatın.','"Biz" yerine "ben": sizin bireysel aksiyonunuz neydi?',['Suçlama veya kaçınma','Uzlaşma var, rolü belirsiz','Açık rol, yapıcı iletişim, ekip sonucu']],
+ ['Takım çalışması','Bir ekip arkadaşınızın işini üstlenmek zorunda kaldığınız bir örnek verin.','Bunu yaparken kendi işinizi nasıl yönettiniz?',['Şikâyet odaklı','Destek var, plan yok','Planlı destek, yöneticiye bilgi, kalıcı çözüm']],
+ ['Analitik düşünme','Bir kararı veriyle desteklediğiniz ya da değiştirdiğiniz bir durumu anlatın.','Veriyi nereden aldınız, hangi hesaplamayı yaptınız?',['Sezgi, veri yok','Veri var, yorum yüzeysel','Kaynak, yöntem ve karara etkisi açık']],
+ ['Analitik düşünme','Dağınık bir tabloyu düzenleyip rapora çevirdiğiniz bir örnek verin.','Hangi hataları buldunuz, raporu kim kullandı?',['Araç adı sayılıyor, örnek yok','Temizlik adımları var','Hata tespiti, formül, raporun karar etkisi']],
+ ['Etik ve gizlilik','Gizli bir bilgiyi korumanız gereken bir durumu anlatır mısınız?','Baskı gördünüz mü, nasıl yanıt verdiniz?',['Gizlilik ihlali normalleştiriliyor','Kural biliniyor, uygulama zayıf','Net sınır, doğru kanal, kayıt']],
+ ['Etik ve gizlilik','Bir yöneticinin kurala aykırı bir talebiyle karşılaştınız mı?','Talebi nasıl geri çevirdiniz, alternatif önerdiniz mi?',['Talebi uygulamış','Reddetmiş, açıklama yok','Mevzuata dayalı ret ve uygulanabilir alternatif']],
+ ['Değişime uyum','Yeni bir sistem veya süreci kısa sürede öğrenmeniz gereken bir durumu anlatın.','Öğrenmek için hangi adımları attınız, ne kadar sürdü?',['Direnç veya başkasına bağımlılık','Öğrenmiş, yöntem belirsiz','Planlı öğrenme, başkalarına aktarma']],
+ ['Değişime uyum','Planladığınız bir işin son anda değiştiği bir örnek verin.','İlk tepkiniz neydi, sonucu nasıl kurtardınız?',['Şikâyet odaklı','Uyum var, sonuç belirsiz','Hızlı yeniden planlama ve ölçülebilir sonuç']]];
+const JOBS=[
+ {id:'j1',t:'İK Yönetici Adayı Programı',c:'Anadolu Lojistik',city:'İstanbul',mode:'Hibrit',type:'Yönetici Adayı Programı',area:'Genel İK',sk:['Rotasyon: işe alım, bordro, organizasyonel gelişim','Excel','Sunum'],h:'#pusula'},
+ {id:'j2',t:'İşe Alım Uzman Yardımcısı',c:'TechNova Yazılım',city:'İstanbul',mode:'Hibrit',type:'Tam zamanlı',area:'İşe Alım',sk:['Aday takip sistemi kullanımı','mantıksal arama','Yetkinlik bazlı mülakat'],h:'#ats'},
+ {id:'j3',t:'Bordro ve Özlük Uzman Yardımcısı',c:'Marmara Gıda',city:'Kocaeli',mode:'Ofis',type:'Tam zamanlı',area:'Bordro ve Özlük',sk:['Puantaj','SGK bildirgeleri','4857 temel bilgisi'],h:'#bordro'},
+ {id:'j4',t:'İK Analitiği Stajyeri (6 ay)',c:'Kuzey Perakende',city:'Ankara',mode:'Uzaktan',type:'Uzun dönem staj',area:'İK Analitiği',sk:['Excel özet tablo','Power BI temeli','İşten ayrılma hesabı'],h:'#lab'},
+ {id:'j5',t:'Eğitim ve Gelişim Uzman Yardımcısı',c:'Ege Tekstil',city:'İzmir',mode:'Ofis',type:'Tam zamanlı',area:'Eğitim ve Gelişim',sk:['Eğitim takvimi','Adam/saat raporu','Oryantasyon'],h:'#sablon'},
+ {id:'j6',t:'Genel İK Uzmanı (Yeni Mezun)',c:'Sakarya Otomotiv Yan Sanayi',city:'Sakarya',mode:'Ofis',type:'Tam zamanlı',area:'Genel İK',sk:['Özlük','İşe alım','İSG koordinasyonu'],h:'#vaka'},
+ {id:'j7',t:'İK Analitiği Yönetici Adayı',c:'Delta Enerji',city:'İstanbul',mode:'Hibrit',type:'Yönetici Adayı Programı',area:'İK Analitiği',sk:['SQL veya Python temeli','İK metrikleri','Veri görselleştirme'],h:'#lab'},
+ {id:'j8',t:'Yetenek Kazanımı Stajyeri',c:'Boğaziçi Danışmanlık',city:'İstanbul',mode:'Uzaktan',type:'Uzun dönem staj',area:'İşe Alım',sk:['LinkedIn’de aday arama','Aday iletişimi','KVKK'],h:'#soru'}];
+const GL=[
+ ['Analitik','İşten ayrılma oranı','Dönem içinde ayrılan çalışan sayısının ortalama çalışan sayısına oranı: Ayrılan / ((Dönem başı + Dönem sonu) / 2) × 100.'],
+ ['Analitik','Gönüllü ayrılma oranı','Yalnızca çalışanın kendi isteğiyle (istifa) ayrılmalarını sayan oran; işveren feshi dışarıda bırakılır. Tutundurma başarısını gösterir.'],
+ ['Analitik','İlk 90 gün kaybı (erken ayrılma)','İşe girişten sonraki 90 gün içinde ayrılanların oranı. Genellikle işe alım veya oryantasyon sorununa işaret eder.'],
+ ['Analitik','Ücret konum oranı','Çalışanın maaşının kademe orta noktasına (orta nokta) oranı. %100 bant ortası, %90 altı piyasa altı ödeme riskidir.'],
+ ['Analitik','Bant orta noktası','Ücret bandının ortası; genellikle piyasa medyanını temsil eder. Bant minimumu çoğu zaman orta nokta\'in %80\'i, maksimumu %120\'sidir.'],
+ ['Analitik','Ayrılma riski','Bir çalışanın veya grubun yakın dönemde ayrılma olasılığı; düşük ücret konum oranı ve çıkış nedenleriyle birlikte izlenir.'],
+ ['İşe Alım','İşe alım süresi','Seçilen adayın başvurusundan teklifi kabul ettiği güne kadar geçen süre.'],
+ ['İşe Alım','Pozisyon doldurma süresi','Kadro talebinin onaylanmasından teklif kabulüne kadar geçen süre; pozisyonun ne kadar boş kaldığını gösterir.'],
+ ['İşe Alım','İşe alım başına maliyet','İşe alım başına maliyet: (ilan, ajans ve İK ekibi zaman maliyeti) / işe alınan kişi sayısı.'],
+ ['İşe Alım','Teklif kabul oranı','Kabul edilen teklif / yapılan teklif. %70\'in altı ücret veya işveren markası sorununu düşündürür.'],
+ ['İşe Alım','Aşama geçiş oranı (huni verimi)','Huninin bir aşamasından diğerine geçen aday oranı; hangi kanalın nitelikli aday getirdiğini gösterir.'],
+ ['İşe Alım','Mantıksal arama','AND (ve), OR (veya), NOT ve parantezle kurulan arama dizilimi; LinkedIn ve aday takip sisteminde pasif aday bulmak için kullanılır.'],
+ ['İşe Alım','DGES tekniği','Durum, Görev, Eylem, Sonuç (DGES) yapısıyla geçmiş davranışı soran mülakat yöntemi.'],
+ ['İşe Alım','Sondaj sorusu','Adayın yuvarlak cevabındaki eksik DGES halkasını açmak için sorulan takip sorusu.'],
+ ['İşe Alım','Gerçekçi iş önizlemesi','Adaya işin zorlukları dahil gerçekçi resmini vermek; erken dönem ayrılmayı azaltır.'],
+ ['İşe Alım','İşe alım kalitesi','İşe alınan kişinin performansı, tutundurulması ve yönetici memnuniyetiyle ölçülen işe alım kalitesi.'],
+ ['İşe Alım','İşveren markası','Kurumun mevcut ve potansiyel çalışanlar gözündeki "çalışılacak yer" algısı.'],
+ ['Teknoloji','Aday takip sistemi',' ilan, başvuru, mülakat puan kartı ve teklif süreçlerini yöneten yazılım.'],
+ ['Teknoloji','İK bilgi sistemi',' personel ana verisi, organizasyon, izin ve özlük kayıtları.'],
+ ['Teknoloji','Öğrenme yönetim sistemi',' eğitim kayıtları, içerik ve adam/saat raporlaması.'],
+ ['Bordro ve Hukuk','Çıplak brüt ücret','Yan haklar eklenmemiş kök brüt ücret. Yıllık izin ve fazla mesai ücreti bunun üzerinden hesaplanır.'],
+ ['Bordro ve Hukuk','Giydirilmiş brüt ücret','Çıplak brüte süreklilik arz eden yan hakların (yol, yemek, düzenli ikramiye) eklenmiş hali; kıdem tazminatına esas alınır.'],
+ ['Bordro ve Hukuk','Kıdem tazminatı','En az 1 yıl çalışmış işçiye kanunda sayılan hallerde her tam yıl için 30 günlük giydirilmiş ücret tutarında ödeme; tavanla sınırlıdır (1475 Md. 14).'],
+ ['Bordro ve Hukuk','İhbar öneli','Belirsiz süreli sözleşmeyi fesheden tarafın uyması gereken bildirim süresi: kıdeme göre 2, 4, 6 veya 8 hafta (4857 Md. 17).'],
+ ['Bordro ve Hukuk','İkale','İşçi ve işverenin karşılıklı anlaşmayla iş sözleşmesini sona erdirmesi; genellikle ek ödeme içerir.'],
+ ['Bordro ve Hukuk','Puantaj','Çalışanın aylık çalışma, tatil, izin ve devamsızlık günlerinin kodlu kaydı; bordronun girdisidir.'],
+ ['Bordro ve Hukuk','SGK eksik gün kodu','Ay içinde 30 günden eksik prim bildiriminin nedenini gösteren kod (ör. 01 istirahat, 15 devamsızlık, 21 diğer ücretsiz izin).'],
+ ['Bordro ve Hukuk','Performans geliştirme planı (PGP)','Düşük performanslı çalışana hedef, süre ve destekle verilen yazılı gelişim planı; geçerli fesihte belgeleme sağlar.'],
+ ['Eğitim ve Gelişim','Oryantasyon (işe alıştırma)','Yeni çalışanın işe ve kuruma uyumunu sağlayan, ilk günden ilk 90 güne uzanan süreç.'],
+ ['Eğitim ve Gelişim','İşe başlama öncesi hazırlık','Teklif kabulü ile ilk iş günü arasındaki hazırlık: hoş geldin iletişimi, ekipman ve hesaplar.'],
+ ['Eğitim ve Gelişim','Rehber çalışan','Yeni çalışana ilk haftalarda rehberlik eden, yöneticisi olmayan deneyimli çalışan.'],
+ ['Eğitim ve Gelişim','Nabız anketi','Kısa aralıklarla uygulanan birkaç soruluk bağlılık ve uyum anketi.'],
+ ['Eğitim ve Gelişim','Çıkış mülakatı','Ayrılan çalışanla yapılan, ayrılma nedenlerini kodlayan görüşme; işten ayrılma kök neden analizinin girdisidir.'],
+ ['Eğitim ve Gelişim','9’lu yetenek matrisi','Çalışanları performans ve potansiyel eksenlerinde 3×3 ızgaraya yerleştiren yetenek değerlendirme aracı.'],
+ ['Eğitim ve Gelişim','Kirkpatrick modeli','Eğitimi dört düzeyde değerlendirir: tepki, öğrenme, davranış, sonuç.'],
+ ['Eğitim ve Gelişim','Eğitim yatırım getirisi (Phillips)','(Ölçülen finansal getiri − eğitim maliyeti) / eğitim maliyeti × 100.'],
+ ['Eğitim ve Gelişim','Hedefler ve anahtar sonuçlar','İddialı bir hedef ve onu ölçen 2-5 sayısal sonuç.'],
+ ['Eğitim ve Gelişim','İK İş Ortağı','İK iş ortağı: bir iş birimine stratejik İK danışmanlığı veren, uzman ekiplerle köprü kuran rol.']];
+/* ---------- CV kliniği ---------- */
+const CK=[['CV','Tek sayfa ve PDF formatında'],['CV','Üstte hedef role yönelik 2-3 cümlelik özet'],['CV','Her deneyimde en az bir sayısal sonuç (%, TL, kişi, gün)'],['CV','Kullandığın İK araçları yazılı (Excel, aday takip sistemi, İK bilgi sistemi)'],['CV','"İletişimi güçlü" gibi kanıtsız sıfatlar yok'],['CV','Portfolyo linki eklenmiş'],['CV','Fotoğraf, medeni hal, TC kimlik no gibi gereksiz kişisel veri yok'],['LinkedIn','Başlık: unvan + odak alanı (ör. İKY Mezunu | İşe Alım ve İK Analitiği)'],['LinkedIn','Hakkında bölümünde hedef rol ve kanıtlar'],['LinkedIn','Kişiselleştirilmiş profil adresi'],['LinkedIn','Öne çıkanlar bölümünde portfolyo projeleri'],['LinkedIn','En az 2 öneri (staj yöneticisi, mentor)']];
+function renderCK(){
+  $('#ckList').innerHTML=CK.map((c,i)=>`<label class="check-item"><input type="checkbox" data-ck="${i}" ${S.cv.includes(i)?'checked':''}><span><span class="pill info">${c[0]}</span> ${c[1]}</span></label>`).join('');
+  const p=Math.round(S.cv.length/CK.length*100);const el=$('#ckScore');el.textContent='%'+p+' hazır';el.className='pill '+(p>=80?'good':p>=50?'warn':'bad');
+  $$('[data-ck]').forEach(c=>c.onchange=()=>{const i=+c.dataset.ck;S.cv=c.checked?[...S.cv,i]:S.cv.filter(x=>x!==i);save();renderCK()});
+}
+const CLICHE=['iletişimi güçlü','takım çalışmasına yatkın','sorumluluk sahibi','çalışkan','dinamik','öğrenmeye açık','problem çözme yeteneği','stres altında çalışabilen'];
+const VERBS=['hazırladım','tasarladım','yürüttüm','yönettim','analiz ettim','azalttım','artırdım','hesapladım','geliştirdim','koordine ettim','kurdum','raporladım','düzenledim','eledim','planladım'];
+function cvAnalyze(){
+  const t=$('#cvText').value, lo=t.toLocaleLowerCase('tr-TR');
+  const words=(t.match(/\S+/g)||[]).length;
+  const nums=(t.match(/%\s?\d+|\d+\s?%|\d[\d.,]*\s?(TL|kişi|gün|ay|saat|başvuru|aday)?/gi)||[]).length;
+  const cl=CLICHE.filter(c=>lo.includes(c)), vb=VERBS.filter(v=>lo.includes(v));
+  const biz=(lo.match(/\bbiz\b|ekipçe/g)||[]).length;
+  const items=[
+   [nums>=2,'Sayısal kanıt',nums+' sayısal ifade bulundu. '+(nums>=2?'İyi; sonuçlar ölçülebilir.':'Her maddeye en az bir sayı ekle (ör. "120 başvuruyu 3 günde eledim").')],
+   [vb.length>=2,'Eylem fiilleri',vb.length?'Kullanılanlar: '+vb.join(', ')+'.':'Maddeleri "hazırladım, analiz ettim, azalttım" gibi eylem fiilleriyle başlat.'],
+   [!cl.length,'Kanıtsız sıfatlar',cl.length?'Kaldır ya da kanıtla: "'+cl.join('", "')+'".':'Klişe sıfat bulunmadı.'],
+   [!biz,'"Biz" dili',biz?biz+' yerde "biz/ekipçe" geçiyor. İşverenler senin bireysel katkını arar.':'Bireysel katkı dili kullanılmış.'],
+   [words>=30&&words<=180,'Uzunluk',words+' kelime. '+(words<30?'Biraz kısa; en az iki deneyim maddesi ekle.':words>180?'Uzun; her deneyimi 2-3 maddeye indir.':'Uygun uzunluk.')]];
+  $('#cvOut').innerHTML=`<div class="row"><b>Skor: ${items.filter(x=>x[0]).length}/5</b></div>`+items.map(x=>`<div class="fb ${x[0]?'ok':'err'}"><b>${x[1]}</b><p>${esc(x[2])}</p></div>`).join('');
+}
+$('#cvText').addEventListener('input',cvAnalyze);
+
+/* ---------- Özgeçmiş–ilan uyum analizi (Türkçe NLP) ---------- */
+const NLP_SAMPLE_JOB=`İnsan Kaynakları Uzman Yardımcısı (Yeni Mezun) — örnek ilan
+Görev tanımı:
+- İşe alım süreçlerinde ilan yayınlama, aday takip sistemi üzerinden ön eleme ve mülakat planlama
+- Puantaj, izin takibi ve özlük dosyalarının güncellenmesi
+- Aylık işten ayrılma ve işe alım raporlarının Excel ile hazırlanması
+- Oryantasyon programının koordinasyonu
+Aranan nitelikler:
+- Üniversitelerin İnsan Kaynakları Yönetimi, Çalışma Ekonomisi veya İşletme bölümlerinden lisans mezunu
+- 0-2 yıl deneyimli
+- İleri düzeyde Excel (DÜŞEYARA, özet tablo) bilgisi
+- 4857 sayılı İş Kanunu ve SGK mevzuatına hâkim
+- KVKK konusunda bilgi sahibi
+- İyi derecede İngilizce
+- Power BI bilgisi tercih sebebidir`;
+const NLP_SAMPLE_CV=`Deniz Yılmaz — İnsan Kaynakları Yönetimi Lisans Mezunu (2026) — örnek özgeçmiş
+Özet: İşe alım ve İK analitiği alanında kariyer hedefleyen yeni mezun.
+Deneyim
+X Lojistik A.Ş. — İK Stajyeri (Haziran–Eylül 2025)
+- 120 başvuruyu aday takip sisteminde ön elemeden geçirdim, 18 adayla telefon ön görüşmesi yaptım.
+- Aylık işten ayrılma raporunu Excel özet tablo ve DÜŞEYARA ile hazırladım.
+- 25 yeni çalışanın oryantasyon programına destek verdim.
+Projeler
+- İK Kampüs bordro simülatörü: kıdem ve ihbar tazminatı hesaplama dosyası.
+Beceriler: Excel, puantaj, 4857 sayılı İş Kanunu, yetkinlik bazlı mülakat
+Diller: İngilizce (B2)`;
+const STOP=new Set('ve veya ile için gibi bir bu şu o da de ki mi mı mu mü ama fakat ancak çok daha en her hem ise olarak olan olan olup olması olduğu üzerinden üzere kadar sonra önce arasında içinde ayrıca dahil tüm bütün diğer sahip konusunda konularında alanında alanında yönelik ilgili göre değil var yok gerekir gereken tercih sebebidir sebebi tercihen olmak etmek yapmak edilmesi yapılması bilgi bilgisi düzeyde düzeyinde derecede iyi ileri olan kişi aday adaylar arıyoruz aranan nitelikler görev tanımı tanım örnek ilan özgeçmiş mezunu biz siz ben onlar şirket şirketimiz firmamız bünyesinde üzerine bölümlerinden bölümünden üniversitelerin hakim hâkim sahibi güncellenmesi hazırlanması takibi yeni yardımcısı uzman uzmanı mezun ekonomisi işletme lisans üniversite yapılması dosyalarının süreçlerinde süreçleri programının programı üzerinde kullanarak sağlanması yürütülmesi'.split(' '));
+const SUF=['lerinden','larından','lerinde','larında','lerine','larına','lerini','larını','ndeki','ndaki','leri','ları','ının','inin','unun','ünün','ması','mesi','ımız','imiz','nın','nin','nun','nün','dan','den','tan','ten','nda','nde','daki','deki','lık','lik','luk','lük','ler','lar','dır','dir','dur','dür','yla','yle','la','le','da','de','ta','te','ın','in','un','ün','ya','ye','yı','yi','yu','yü','sı','si','su','sü','ı','i','u','ü','a','e'].sort((a,b)=>b.length-a.length);
+function stem(w){if(/^\d+$/.test(w)||w.length<5)return w;let s=w;for(let k=0;k<3;k++){let ch=false;for(const x of SUF){if(s.endsWith(x)&&s.length-x.length>=4){s=s.slice(0,-x.length);ch=true;break}}if(!ch)break}return s}
+function norm(t){return t.replace(/İ/g,'i').replace(/I/g,'ı').toLocaleLowerCase('tr-TR').replace(/â/g,'a').replace(/î/g,'i').replace(/û/g,'u')}
+function tokens(t){return norm(t).replace(/[^a-zçğıöşü0-9]+/g,' ').split(' ').filter(w=>w.length>1&&!STOP.has(w))}
+function feats(t){const tk=tokens(t),st=tk.map(stem),f=[...st];for(let i=0;i<st.length-1;i++)f.push(st[i]+' '+st[i+1]);return {tk,st,f}}
+const SKILLS=[
+ ['Excel','Teknik',['excel'],'lab'],['Özet tablo (pivot)','Teknik',['özet tablo','pivot'],'lab'],['DÜŞEYARA / XLOOKUP','Teknik',['düşeyara','vlookup','xlookup','çaprazara'],'lab'],['Power BI','Teknik',['power bi','powerbi'],'lab'],['SQL','Teknik',['sql'],'lab'],['Python / R','Teknik',['python',' r programlama'],'lab'],
+ ['Aday takip sistemi','Teknik',['aday takip',' ats '],'ats'],['İK bilgi sistemi','Teknik',[' sap ','successfactors','workday','kolay ik','ik bilgi sistemi','hris'],'ats'],
+ ['İşe alım','Alan',['işe alım','ise alim','seçme ve yerleştirme','recruitment'],'ats'],['Ön eleme','Alan',['ön eleme','özgeçmiş tarama','cv tarama'],'ats'],['Yetkinlik bazlı mülakat','Alan',['yetkinlik bazlı','dges','star tekni','davranışsal mülakat'],'soru'],['Mülakat','Alan',['mülakat','görüşme'],'soru'],['İlan yazımı','Alan',['ilan yay','ilan metni','iş ilanı'],'ats'],['Aday arama','Alan',['aday arama','linkedin','mantıksal arama','boolean'],'ats'],
+ ['Bordro','Alan',['bordro','tahakkuk'],'bordro'],['Puantaj','Alan',['puantaj','fazla mesai'],'bordro'],['Özlük işlemleri','Alan',['özlük'],'bordro'],['İzin yönetimi','Alan',['izin takib','yıllık izin','izin yönetim'],'sablon'],['SGK mevzuatı','Mevzuat',['sgk','sosyal güvenlik'],'bordro'],['4857 / İş Kanunu','Mevzuat',['4857','iş kanunu','iş hukuku'],'rehber'],['KVKK','Mevzuat',['kvkk','kişisel veri','6698'],'rehber'],['Kıdem ve ihbar hesabı','Alan',['kıdem taz','kıdem ve ihbar','ihbar'],'bordro'],
+ ['Oryantasyon','Alan',['oryantasyon','işe alıştırma'],'sablon'],['Eğitim ve gelişim','Alan',['eğitim planla','eğitim ve gelişim','eğitim programı','eğitim ihtiyaç'],'sablon'],['Performans yönetimi','Alan',['performans yönetim','performans değerlendirme','hedef kartı'],'vaka'],['İK raporlama','Alan',['rapor'],'lab'],['İK analitiği','Alan',['ik analiti','işten ayrılma','turnover','metrik'],'lab'],['Ücret yönetimi','Alan',['ücret yönetim','ücret band','ücret konum'],'lab'],
+ ['İngilizce','Dil',['ingilizce','english'],'sertifika'],['Almanca','Dil',['almanca'],'sertifika'],
+ ['İletişim becerisi','Kişisel',['iletişim'],'klinik'],['Takım çalışması','Kişisel',['takım çalışma','ekip çalışma'],'soru'],['Analitik düşünme','Kişisel',['analitik düşün','analitik bakış'],'lab'],['Planlama ve organizasyon','Kişisel',['planla','organize','koordinasyon','koordine'],'vaka']];
+function findSkills(t){const n=' '+norm(t)+' ',n2=n.replace(/ı/g,'i');return SKILLS.filter(s=>s[2].some(p=>n.includes(p)||n2.includes(p.replace(/ı/g,'i'))))}
+let REF=null;
+function refCorpus(){if(REF)return REF;const docs=[...GL.map(g=>g[1]+' '+g[2]),...CASES.map(c=>c.t+' '+c.p+' '+c.d.join(' ')),...QB.map(q=>q[1]+' '+q[2]),...JOBS.map(j=>j.t+' '+j.sk.join(' ')),...DOCS.map(d=>d.t+' '+d.o.join(' '))].map(d=>new Set(feats(d).f));REF=docs;return REF}
+function tfidf(f,df,N){const tf={};f.forEach(x=>tf[x]=(tf[x]||0)+1);const v={};for(const k in tf){v[k]=(tf[k]/f.length)*(Math.log((N+1)/((df[k]||0)+1))+1)}return v}
+function cos(a,b){let d=0,na=0,nb=0;for(const k in a){na+=a[k]*a[k];if(b[k])d+=a[k]*b[k]}for(const k in b)nb+=b[k]*b[k];return na&&nb?d/Math.sqrt(na*nb):0}
+function surface(tk,st){const m={};st.forEach((s,i)=>{(m[s]=m[s]||{})[tk[i]]=((m[s]||{})[tk[i]]||0)+1});const o={};for(const s in m)o[s]=Object.entries(m[s]).sort((a,b)=>b[1]-a[1])[0][0];return o}
+function yearsReq(line){const m=norm(line).match(/(\d+)\s*(?:-|–|ile)?\s*(\d+)?\s*y[ıi]l/);return m?{min:+m[1],max:m[2]?+m[2]:null}:null}
+function cvYears(cv){const n=norm(cv);let y=0;const m=n.match(/(\d+)\s*y[ıi]l(?:l[ıi]k)?\s*(?:iş\s*)?(?:deneyim|tecrübe)/);if(m)y=+m[1];return y}
+function biasCheck(job){const n=norm(job),out=[];
+ if(/\b(\d{2})\s*yaşını\s*(geçmemiş|aşmamış)|\b\d{2}\s*-\s*\d{2}\s*yaş|yaş sınırı/.test(n))out.push('Yaş sınırı içeriyor. İşin niteliği gerektirmiyorsa 4857 Md. 5 eşit davranma ilkesi açısından sorunlu.');
+ if(/\bbayan\b|\berkek\b|\bkadın aday|\berkek aday/.test(n))out.push('Cinsiyet belirten ifade var. Cinsiyete dayalı ayrım 4857 Md. 5 kapsamında yasaktır.');
+ if(/bekar|evli olmayan|medeni hal/.test(n))out.push('Medeni hale ilişkin şart var; iş ile ilgisiz özel bilgi talebidir.');
+ if(/fotoğraflı|fotoğraf ekl/.test(n))out.push('Fotoğraflı özgeçmiş isteniyor; görünüşe dayalı önyargı riskini artırır.');
+ if(/askerlik(ini)? (yapmış|tamamlamış)/.test(n))out.push('Askerlik şartı var; yalnızca bir cinsiyeti etkilediği için gerekçesinin ilanda açıklanması önerilir.');
+ return out}
+function scoreRing(p){const r=52,c=2*Math.PI*r,col=p>=70?'var(--good)':p>=45?'var(--warn)':'var(--bad)';return `<svg viewBox="0 0 130 130" width="130" height="130" role="img" aria-label="Uyum puanı %${p}"><circle cx="65" cy="65" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="12"/><circle cx="65" cy="65" r="${r}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 65 65)"/><text x="65" y="62" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" font-size="28" fill="var(--ink)">%${p}</text><text x="65" y="84" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Inter,sans-serif">uyum</text></svg>`}
+function nlpAnalyze(auto){
+  const cv=$('#nlpCv').value.trim(),job=$('#nlpJob').value.trim(),out=$('#nlpOut');
+  if(cv.length<40||job.length<40){out.innerHTML='<div class="fb err"><b>Metin çok kısa.</b><p>Her iki alana da en az 40 karakterlik metin gir.</p></div>';return}
+  const ref=refCorpus(),N=ref.length+2,A=feats(cv),B=feats(job);
+  const df={};[...ref,new Set(A.f),new Set(B.f)].forEach(s=>s.forEach(x=>df[x]=(df[x]||0)+1));
+  const va=tfidf(A.f,df,N),vb=tfidf(B.f,df,N),sim=cos(va,vb);
+  const cvSet=new Set(A.st);
+  const sJ=findSkills(job),sC=findSkills(cv),cN=new Set(sC.map(s=>s[0]));
+  const have=sJ.filter(s=>cN.has(s[0])),miss=sJ.filter(s=>!cN.has(s[0])),extra=sC.filter(s=>!sJ.some(x=>x[0]===s[0]));
+  const cover=sJ.length?have.length/sJ.length:sim;
+  // gereksinimler
+  let lines=job.split(/\n|•|;/).map(l=>l.replace(/^[\s\-*–·]+/,'').replace(/^\d+[.)]\s+/,'').trim());
+  if(lines.filter(Boolean).length>3)lines=lines.slice(lines.findIndex(Boolean)+1);
+  lines=lines.filter(l=>l.length>8&&!/:\s*$/.test(l)&&!/^(çalışma şekli|ilan türü)\b/i.test(l));
+  const cy=cvYears(cv);
+  const reqs=lines.map(l=>{const y=yearsReq(l);if(y&&/deneyim|tecrübe/.test(norm(l))){const ok=cy>=y.min;return {l,st:ok?2:0,why:ok?`İstenen en az ${y.min} yıl; özgeçmişte ${cy?cy+' yıl':'yeni mezun / staj'} görünüyor.`:`En az ${y.min} yıl isteniyor; özgeçmişte ${cy} yıl görünüyor.`}}
+    const ks=[...new Set(feats(l).st)].filter(k=>k.length>2);const sk=findSkills(l);
+    const hitSk=sk.filter(s=>cN.has(s[0])).length,hitK=ks.filter(k=>cvSet.has(k)).length;
+    const r=sk.length?(hitSk/sk.length)*0.7+(ks.length?hitK/ks.length:0)*0.3:(ks.length?hitK/ks.length:0);
+    const st=r>=0.6?2:r>=0.3?1:0;const missK=sk.filter(s=>!cN.has(s[0])).map(s=>s[0]);
+    return {l,st,why:missK.length?(st===2?'Büyük ölçüde karşılanıyor; eksik: ':'Eksik: ')+missK.join(', '):(st===2?'Özgeçmişte karşılığı var.':'Anahtar kelimelerin bir kısmı bulunamadı.')}});
+  const reqScore=reqs.length?reqs.reduce((a,r)=>a+r.st/2,0)/reqs.length:cover;
+  const score=Math.round((0.45*cover+0.30*reqScore+0.25*Math.min(1,sim*2))*100);
+  // anahtar kelime açıkları
+  const sfB=surface(B.tk,B.st),sfA=surface(A.tk,A.st);
+  const topB=Object.entries(vb).filter(([k])=>!k.includes(' ')&&k.length>2&&!/^\d+$/.test(k)).sort((a,b)=>b[1]-a[1]);
+  const gaps=topB.filter(([k])=>!cvSet.has(k)).slice(0,10).map(([k])=>sfB[k]||k);
+  const head=new Set(feats(cv.split('\n')[0]||'').st);
+  const topA=Object.entries(va).filter(([k])=>!k.includes(' ')&&k.length>2&&!/^\d+$/.test(k)&&!head.has(k)).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxB=topB.length?topB[0][1]:1,maxA=topA.length?topA[0][1]:1;
+  const bias=biasCheck(job);
+  const chip=(s,cls)=>`<span class="pill ${cls}" title="${s[1]}">${s[0]}</span>`;
+  const verdict=score>=70?'Güçlü uyum: başvurabilirsin, eksikleri ön yazıda ele al.':score>=45?'Orta uyum: eksik becerileri özgeçmişte görünür kıl ya da kısa sürede kapat.':'Zayıf uyum: bu ilan için önce aşağıdaki açıkları kapat.';
+  const bars=(arr,mx,sf)=>arr.map(([k,v])=>`<div class="skill-line" style="grid-template-columns:minmax(0,1fr) 120px"><span>${esc(k.split(' ').map(x=>sf[x]||x).join(' '))}</span><div class="bar"><i style="width:${v/mx*100}%"></i></div></div>`).join('');
+  const sugg=[...new Map(miss.map(s=>[s[3],s])).values()];
+  out.innerHTML=`<div class="grid" style="grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center">${scoreRing(score)}
+    <div style="display:flex;flex-direction:column;gap:8px;min-width:0"><h3>${verdict}</h3>
+      ${[['Beceri kapsaması',cover,`${have.length}/${sJ.length} ilan becerisi özgeçmişte var`],['Gereksinim karşılama',reqScore,`${reqs.filter(r=>r.st===2).length}/${reqs.length} madde tam karşılanıyor`],['Anlamsal yakınlık (TF-IDF kosinüs)',Math.min(1,sim*2),`kosinüs = ${sim.toFixed(2)}`]].map(x=>`<div class="skill-line" style="grid-template-columns:minmax(0,180px) minmax(0,1fr) 48px"><span>${x[0]}</span><div class="bar"><i style="width:${Math.round(x[1]*100)}%"></i></div><b class="num">%${Math.round(x[1]*100)}</b></div><span class="small muted" style="margin-top:-6px">${x[2]}</span>`).join('')}
+    </div></div>
+   <div class="grid g3">
+     <div><h4>Eşleşen beceriler</h4><div class="row" style="margin-top:6px">${have.map(s=>chip(s,'good')).join('')||'<span class="small muted">Yok</span>'}</div></div>
+     <div><h4>Eksik beceriler</h4><div class="row" style="margin-top:6px">${miss.map(s=>chip(s,'bad')).join('')||'<span class="small muted">Eksik beceri bulunamadı</span>'}</div></div>
+     <div><h4>Özgeçmişteki ek beceriler</h4><div class="row" style="margin-top:6px">${extra.map(s=>chip(s,'info')).join('')||'<span class="small muted">Yok</span>'}</div></div>
+   </div>
+   <div><h4>Gereksinim bazında eşleşme</h4><div class="tbl-wrap" style="margin-top:6px"><table><tr><th>İlan maddesi</th><th>Durum</th><th>Açıklama</th></tr>${reqs.map(r=>`<tr><td style="white-space:normal;min-width:220px">${esc(r.l)}</td><td><span class="pill ${['bad','warn','good'][r.st]}">${['Eksik','Kısmen','Karşılanıyor'][r.st]}</span></td><td style="white-space:normal;min-width:180px" class="small">${esc(r.why)}</td></tr>`).join('')}</table></div></div>
+   <div class="grid g2">
+     <div><h4>İlanın ayırt edici kavramları</h4><p class="small muted">TF-IDF ağırlığına göre ilk 10 kavram</p><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${bars(topB.slice(0,10),maxB,sfB)}</div></div>
+     <div><h4>Özgeçmişinin ayırt edici kavramları</h4><p class="small muted">İşverenin özgeçmişinden okuyacağı öne çıkan kavramlar (ad-soyad satırı hariç)</p><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${bars(topA,maxA,sfA)}</div></div>
+   </div>
+   <div><h4>Özgeçmişine eklemeyi düşünebileceğin anahtar kelimeler</h4><p class="small muted">İlanda ağırlığı yüksek olup özgeçmişinde geçmeyen kelimeler. Yalnızca gerçekten sahip olduğun beceriler için ekle.</p><div class="row" style="margin-top:6px">${gaps.map(g=>`<span class="chip">${esc(g)}</span>`).join('')||'<span class="small muted">Önemli bir anahtar kelime açığı yok.</span>'}</div></div>
+   ${false&&sugg.length?`<div><h4>Açıkları platformda kapat</h4><div class="row" style="margin-top:6px">${sugg.map(s=>`<button class="btn ghost sm" data-go="${s[3]}">${s[0]} → ${({lab:'Excel laboratuvarı',ats:'Aday takip simülatörü',soru:'Soru bankası',bordro:'Bordro simülatörü',sablon:'Şablonlar',rehber:'İş hukuku rehberi',vaka:'Vaka analizleri',sertifika:'Sertifika rehberi',klinik:'Klinik'})[s[3]]}</button>`).join('')}</div></div>`:''}
+   <div><h4>İlan dili denetimi</h4>${bias.length?bias.map(b=>`<div class="fb note" style="margin-top:6px">${b}</div>`).join(''):'<p class="small muted">Yaş, cinsiyet, medeni hal veya fotoğraf şartı gibi ayrımcı ifade bulunmadı.</p>'}</div>`;
+  if(!auto&&!S.nlpDone){S.nlpDone=true;save();addXP(30)}
+}
+$('#nlpRun').addEventListener('click',()=>nlpAnalyze());
+$('#nlpSample').addEventListener('click',()=>{$('#nlpCv').value=NLP_SAMPLE_CV;$('#nlpJob').value=NLP_SAMPLE_JOB;nlpAnalyze()});
+$('#nlpClear').addEventListener('click',()=>{$('#nlpCv').value='';$('#nlpJob').value='';$('#nlpOut').innerHTML='';$('#nlpCv').focus()});
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`)){res();return}const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Kütüphane yüklenemedi'));document.head.appendChild(s)})}
+async function readFile(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(ext==='txt')return await file.text();
+  if(ext==='docx'){await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');const r=await window.mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return r.value}
+  if(ext==='pdf'){const base='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';await loadScript(base+'pdf.min.js');const lib=window.pdfjsLib;lib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js';
+    const pdf=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false}).promise;let t='';for(let i=1;i<=Math.min(pdf.numPages,10);i++){const c=await (await pdf.getPage(i)).getTextContent();let lastY=null;for(const it of c.items){if(lastY!==null&&Math.abs(it.transform[5]-lastY)>2)t+='\n';t+=it.str+' ';lastY=it.transform[5]}t+='\n'}return t}
+  throw new Error('Desteklenmeyen dosya türü');
+}
+[['#nlpCvFile','#nlpCv','#nlpCvMsg'],['#nlpJobFile','#nlpJob','#nlpJobMsg']].forEach(([fi,ta,msg])=>$(fi).addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;$(msg).textContent=f.name+' okunuyor…';
+  try{const t=(await readFile(f)).replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n').trim();if(t.length<20)throw new Error('Metin çıkarılamadı (taranmış görüntü olabilir)');$(ta).value=t;$(msg).textContent=f.name+' yüklendi ('+t.length+' karakter).'}
+  catch(err){$(msg).textContent=f.name+' okunamadı: '+err.message+'. Metni kopyalayıp yapıştırabilirsin.'}
+  e.target.value='';
+}));
+$('#nlpCv').value=NLP_SAMPLE_CV;$('#nlpJob').value=NLP_SAMPLE_JOB;
+function jobText(j){return `${j.t} — ${j.c} (örnek ilan)\nÇalışma şekli: ${j.mode}, ${j.city}\nİlan türü: ${j.type}\nAranan nitelikler:\n- İnsan Kaynakları Yönetimi veya ilgili bölümlerden lisans mezunu\n- 0-2 yıl deneyimli\n${j.sk.map(s=>'- '+s).join('\n')}`}
+
+
+renderCK();cvAnalyze();nlpAnalyze(true);
+})();
+</script>
+</body>
+</html>
